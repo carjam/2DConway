@@ -14,7 +14,7 @@ class Solution:
     def __init__(self):
         pass
 
-    def populationAfterNDays(self, cells: List[List[int]], N: int) -> List[List[int]]:
+    def populationAfterNDays(self, cells: List[List[int]]) -> List[List[int]]:
         EMPTY = 0
         NEWB = 1
         ADULT = 2
@@ -63,11 +63,9 @@ class Solution:
             return neibs
 
         ##
-        if N <= 0:
-            return cells
         rows = len(cells)
         cols = len(cells[0])
-       
+
         copyCells = [[cells[row][col] for col in range(cols)] for row in range(rows)]
 
         for row in range(rows):
@@ -87,8 +85,8 @@ class Solution:
                 #print(row, col, cells[row][col], newVal, nei)
                 cells[row][col] = newVal
 
-        return self.populationAfterNDays(cells, N-1)
-
+        #print("\n", np.matrix(cells))
+        return cells
 
 
 
@@ -101,7 +99,7 @@ class Solution:
             return None
         if m1 != m2 or n1 != n2:
             return None
-           
+
         res = [row[:] for row in case1]
         for i, v1 in enumerate(case1):
             for j, v2 in enumerate(case2):
@@ -113,9 +111,10 @@ class Solution:
 
     ###
     # General Coding Exercise Test Cases
+    @utility.profile
     def run(self): 
         ## Final Problem Initial Data:
-        start =  [
+        cells =  [
            [0,0,0,0,0,0,0,0,0,0],
            [0,0,1,1,0,0,0,0,0,0],
            [0,0,0,0,2,0,0,0,0,0],
@@ -127,8 +126,9 @@ class Solution:
            [0,0,0,0,0,0,0,0,0,0],
            [0,0,0,0,0,0,0,0,0,0],
          ]
-        res = self.populationAfterNDays(start, 20)
-        return res
+        for i in range(20):
+            cells = self.populationAfterNDays(cells)
+        return cells
 
 
     ## Test Case 1:
@@ -163,16 +163,16 @@ class Solution:
         ]
         print("\nend:\n")
         print(np.matrix(end1))
-       
-        res = self.populationAfterNDays(start1, 1)
+
+        res = self.populationAfterNDays(start1)
         print("\nresult:\n")
         print(np.matrix(res))
 
         match = self.validate(res, end1);
         print("\nmatch\n")
         print(np.matrix(match))
-        #assert(match == end1)
-    
+        assert(res == end1)
+
     ## Test Case 2:
     def test2(self):
         start2 = [
@@ -206,15 +206,15 @@ class Solution:
         print("\nend:\n")
         print(np.matrix(end2))
 
-        res = self.populationAfterNDays(start2, 1)
+        res = self.populationAfterNDays(start2)
         print("\nresult:\n")
         print(np.matrix(res))
 
         match = self.validate(res, end2)
         print("\nmatch\n")
         print(np.matrix(match))
-        #assert(match == end2)
-    
+        assert(res == end2)
+
     ## Test Case 3:
     def test3(self):
         start3 = [
@@ -247,17 +247,16 @@ class Solution:
         ]
         print("\nend:\n")
         print(np.matrix(end3))
-        
-        res = self.populationAfterNDays(start3, 1)
+
+        res = self.populationAfterNDays(start3)
         print("\nresult:\n")
         print(np.matrix(res))
 
         match = self.validate(res, end3)
         print("\nmatch\n")
         print(np.matrix(match))
-        #assert(match == end3)
+        assert(res == end3)
 
-@utility.profile
 def main():
     solution = Solution()
     solution.test1()
