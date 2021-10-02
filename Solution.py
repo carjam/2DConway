@@ -153,7 +153,7 @@ class Solution:
            [0,0,0,0,0,0,0,0,0,0],
            [0,0,0,0,0,0,0,0,0,0],
          ]
-        for i in range(20):
+        for i in range(19):
             cells = self.populationAfterNDays(cells)
         return cells
 
