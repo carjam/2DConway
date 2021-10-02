@@ -85,7 +85,7 @@ class Solution:
 
             return neibs
 
-        ##
+        ##search each cell's neighbors and derive it's future state
         rows = len(cells)
         cols = len(cells[0])
         for row in range(rows):
@@ -105,7 +105,7 @@ class Solution:
                 #print(row, col, cells[row][col], newVal, nei)
                 cells[row][col] = newVal
 
-        #translate back to readable form
+        #translate back to expected form
         for row in range(rows):
             for col in range(cols):
                 if cells[row][col] < 1:
