@@ -15,41 +15,57 @@ class Solution:
         pass
 
     def populationAfterNDays(self, cells: List[List[int]]) -> List[List[int]]:
+        #states
         EMPTY = 0
         NEWB = 1
         ADULT = 2
         SENIOR = 3
 
-        #EMPTY
+        #state transitions
+        EMPTY_EMPTY = 0
+        EMPTY_NEWB = 4
+        NEWB_EMPTY = -1
+        NEWB_ADULT = 5
+        ADULT_EMPTY = -2
+        ADULT_SENIOR = 6
+        SENIOR_EMPTY = -3
+
+        fromState = {}
+        fromState[EMPTY] = {EMPTY, EMPTY_EMPTY, EMPTY_NEWB}
+        fromState[NEWB] = {NEWB, NEWB_EMPTY, NEWB_ADULT}
+        fromState[ADULT] = {ADULT, ADULT_EMPTY, ADULT_SENIOR}
+        fromState[SENIOR] = {SENIOR, SENIOR_EMPTY}
+
+        #EMPTY rules
         def passTimeEmpty(neibCnt):
             if neibCnt[ADULT] == 2: #reproduction
-                return NEWB
+                return EMPTY_NEWB 
             else: #no change
-                return EMPTY
+                return EMPTY_EMPTY
  
-        #NEWB
+        #NEWB rules
         def passTimeNewb(neibCnt):
             total = sum(neibCnt[k] for k in neibCnt if k > EMPTY)
             if total >= 5: #overcrowding
-                return EMPTY
+                return NEWB_EMPTY
             elif total <= 1: #isolation
-                return EMPTY
+                return NEWB_EMPTY
             else: #growing up
-                return ADULT
+                return NEWB_ADULT
 
-        #ADULT
+        #ADULT rules
         def passTimeAdult(neibCnt):
             total = sum(neibCnt[k] for k in neibCnt if k > EMPTY)
             if total >= 3: #overcrowding
-                return EMPTY
+                return ADULT_EMPTY
             elif total <= 0: #isolation
-                return EMPTY
+                return ADULT_EMPTY
             else: #aging
-                return SENIOR
+                return ADULT_SENIOR
 
-        #SENIOR
+        #SENIOR rules
         def passTimeSenior(neibCnt):
-            return EMPTY #natural causes
+            return SENIOR_EMPTY #natural causes
 
         def countNeighbors(cntCells, r, rows, c, cols):
             neibs = defaultdict(int)
@@ -58,36 +74,47 @@ class Solution:
             for neighbor in neighbors:
                 row, col = r + neighbor[0], c + neighbor[1]
                 if row >= 0 and row < rows and col >= 0 and col < cols:
-                    neibs[cntCells[row][col]] += 1
+                    if cntCells[row][col] in fromState[EMPTY]:
+                        neibs[EMPTY] += 1
+                    elif cntCells[row][col] in fromState[NEWB]:
+                        neibs[NEWB] += 1
+                    elif cntCells[row][col] in fromState[ADULT]:
+                        neibs[ADULT] += 1
+                    elif cntCells[row][col] in fromState[SENIOR]:
+                        neibs[SENIOR] += 1
 
             return neibs
 
         ##
         rows = len(cells)
         cols = len(cells[0])
-
-        copyCells = [[cells[row][col] for col in range(cols)] for row in range(rows)]
-
         for row in range(rows):
             for col in range(cols):
-                nei = countNeighbors(copyCells, row, rows, col, cols)
+                nei = countNeighbors(cells, row, rows, col, cols)
 
                 newVal = -1
-                if copyCells[row][col] == EMPTY:
+                if cells[row][col] == EMPTY:
                     newVal = passTimeEmpty(nei)
-                elif copyCells[row][col] == NEWB:
+                elif cells[row][col] == NEWB:
                     newVal = passTimeNewb(nei)
-                elif copyCells[row][col] == ADULT:
+                elif cells[row][col] == ADULT:
                     newVal = passTimeAdult(nei)
-                elif copyCells[row][col] == SENIOR:
+                elif cells[row][col] == SENIOR:
                     newVal = passTimeSenior(nei)
 
                 #print(row, col, cells[row][col], newVal, nei)
                 cells[row][col] = newVal
 
+        #translate back to readable form
+        for row in range(rows):
+            for col in range(cols):
+                if cells[row][col] < 1:
+                    cells[row][col] = EMPTY
+                else:
+                    cells[row][col] -= 3
+
         #print("\n", np.matrix(cells))
         return cells
-
 
 
     def validate(self, case1: List[List[int]], case2: List[List[int]]) -> List[List[int]]:
